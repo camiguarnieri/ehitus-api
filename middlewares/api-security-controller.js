@@ -64,6 +64,7 @@ const _authorizationBearer = function (req, res, next) {
                                         res.status(500).send({ error: true, message: 'The access_token did not come with the user' });
                                     } else {
                                         if (data.username == username) {
+                                            req.user = data;
                                             next();
                                         } else {
                                             res.status(500).send({ error: true, message: 'Invalid user' });

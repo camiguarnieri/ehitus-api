@@ -25,8 +25,8 @@ app.use(function (err, req, res, next) {
     if (err) {
         const method = req.method;
         const url = req.url;
-        console.log(method + " " + url + " StatusCode 400");
-        res.status(400).send({ message: 'Error 400' });
+        console.log(method + " " + url + " StatusCode 400", err);
+        res.status(400).send({ message: err.message || 'Error 400' });
     } else {
         next();
     }

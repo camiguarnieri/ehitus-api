@@ -1,12 +1,21 @@
 const jwt = require('jsonwebtoken');
-const { JWT_SECRET } = require('../helpers/private_key');
 
-const generateToken = (payload) => {
-    return jwt.sign(payload, JWT_SECRET, { expiresIn: '8h' });
-};
+class AuthToken {
+    constructor(jwt) {
+        this.jwt = jwt;
+    }
 
-const verifyToken = (token) => {
-    return jwt.verify(token, JWT_SECRET);
-};
+    getValidToken(token, privateKey) {
+        return new Promise((resolve) => {
+            this.jwt.verify(token, privateKey, (err, decoded) => {
+                if (err) {
+                    resolve({ err: true });
+                } else {
+                    resolve({ err: false, decoded });
+                }
+            });
+        });
+    }
+}
 
-module.exports = { generateToken, verifyToken };
+module.exports = AuthToken;
