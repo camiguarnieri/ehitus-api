@@ -7,6 +7,7 @@ const usuarioRoutes = require('../routes/usuarioRoutes');
 const empresaRoutes = require('../routes/empresaRoutes');
 const funcionarioRoutes = require('../routes/funcionarioRoutes');
 const obraRoutes = require('../routes/obraRoutes');
+const parametroCargaHorariaRoutes = require('../routes/parametroCargaHorariaRoutes');
 /* End Routes includes */
 
 router.use('/', root);
@@ -14,6 +15,8 @@ router.use('/usuarios', usuarioRoutes);
 router.use('/empresas', empresaRoutes);
 router.use('/funcionarios', funcionarioRoutes);
 router.use('/obras', obraRoutes);
+router.use('/parametros-carga-horaria', parametroCargaHorariaRoutes);
+
 
 // catch 404
 router.use(function (req, res) {
