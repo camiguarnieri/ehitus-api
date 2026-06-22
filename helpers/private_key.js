@@ -6,4 +6,4 @@ const value = async (username) => {
     return JWT_SECRET;
 };
 
-module.exports = { value };
+module.exports = { value, JWT_SECRET };

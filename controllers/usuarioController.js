@@ -1,5 +1,10 @@
+const jwt = require('jsonwebtoken');
+const { JWT_SECRET } = require('../helpers/private_key');
 const usuarioModel = require('../models/usuarioModel');
-const { generateToken } = require('../plugins/auth-token');
+
+const generateToken = (payload) => {
+    return jwt.sign(payload, JWT_SECRET, { expiresIn: '8h' });
+};
 
 const login = async (req, res) => {
     try {
