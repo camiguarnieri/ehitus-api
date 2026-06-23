@@ -1,3 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const { getAll } = require('../controllers/empresaController');
+
+router.get('/', getAll);
+
 module.exports = router;
