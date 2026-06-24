@@ -1,15 +1,26 @@
 const funcionarioModel = require('../models/funcionarioModel');
+const supervisorFuncionarioModel = require('../models/supervisorFuncionarioModel');
 
 const getAll = async (req, res) => {
-    console.log('req.user:', req.user);
     try {
-        const codEmp = req.user.codEmp;
+        const { codEmp, id } = req.user;
+        const data = await supervisorFuncionarioModel.getByUsuario(id);
+        res.send({ error: false, data });
+    } catch (err) {
+        res.status(500).send({ error: true, message: err.message });
+    }
+};
+
+const getAllByEmpresa = async (req, res) => {
+    try {
+        const { codEmp } = req.user;
         const data = await funcionarioModel.getByEmpresa(codEmp);
         res.send({ error: false, data });
     } catch (err) {
         res.status(500).send({ error: true, message: err.message });
     }
 };
+
 
 const getById = async (req, res) => {
     try {
@@ -32,4 +43,4 @@ const create = async (req, res) => {
     }
 };
 
-module.exports = { getAll, getById, create };
+module.exports = { getAll, getAllByEmpresa, getById, create };
