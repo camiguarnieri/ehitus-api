@@ -1,16 +1,17 @@
 const planillaModel = require('../models/planillaHsModel');
-const funcionarioModel = require('../models/funcionarioModel');
+const supervisorFuncionarioModel = require('../models/supervisorFuncionarioModel'); // ← agregar
 
 const getByFechaObra = async (req, res) => {
     try {
         const { fecha, numObra } = req.query;
+        console.log('getByFechaObra:', fecha, numObra, req.user);
         if (!fecha || !numObra) {
             return res.status(400).send({ error: true, message: 'Fecha y obra requeridas' });
         }
-        const codEmp = req.user.codEmp;
 
+        const idUsuario = req.user.id;  // ← cambio acá
         const cargados = await planillaModel.getByFechaObra(fecha, numObra);
-        const todos = await funcionarioModel.getByEmpresa(codEmp);
+        const todos = await supervisorFuncionarioModel.getByUsuario(idUsuario);  // ← y acá
         const parametro = await planillaModel.getParametroDia();
 
         res.send({ error: false, data: { cargados, todos, parametro } });
@@ -19,15 +20,16 @@ const getByFechaObra = async (req, res) => {
         res.status(500).send({ error: true, message: err.message });
     }
 };
-
 const guardar = async (req, res) => {
     try {
         const { registros } = req.body;
         if (!registros || !Array.isArray(registros)) {
             return res.status(400).send({ error: true, message: 'Registros requeridos' });
         }
+        const idUsuario = req.user.id;
+        console.log('idUsuario:', idUsuario); // ← para verificar
         for (const r of registros) {
-            await planillaModel.upsert(r);
+            await planillaModel.upsert({ ...r, idUsuario }); // ← faltaba el spread
         }
         res.send({ error: false, message: 'Guardado correctamente' });
     } catch (err) {

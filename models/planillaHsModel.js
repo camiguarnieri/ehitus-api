@@ -25,7 +25,7 @@ const getParametroDia = async () => {
     return result.recordset[0] || null;
 };
 
-const upsert = async ({ codigo, fecha, numObra, hs, hsExtra, hsExtraEsp, hsNoc, hsExNoc, hsExtNoctPerm, hsFeriados, hsLluvia, hsViaje, altura, donacion, asamblea, paternidad, fallecimiento }) => {
+const upsert = async ({ codigo, fecha, numObra, hs, hsExtra, hsExtraEsp, hsNoc, hsExNoc, hsExtNoctPerm, hsFeriados, hsLluvia, hsViaje, altura, donacion, asamblea, paternidad, fallecimiento, idUsuario }) => {
     const pool = await getConnection();
 
     const mes = fecha.substring(0, 7) + '-01';
@@ -89,9 +89,10 @@ const upsert = async ({ codigo, fecha, numObra, hs, hsExtra, hsExtraEsp, hsNoc, 
             .input('asamblea', asamblea || 0)
             .input('paternidad', paternidad || 0)
             .input('fallecimiento', fallecimiento || 0)
+            .input('idUsuario', idUsuario || null)
             .query(`
-                INSERT INTO PlanillaHs (ID_, Codigo, Mes, Fecha, NumOra, Hs, HsExtra, HsExtraEsp, HsNoc, HsExNoc, HsExtNoctPerm, HsFeriados, HsLluvia, HsViaje, Altura, Donacion, Asamblea, Paternidad, Fallecimiento)
-                VALUES (@id, @codigo, @mes, @fecha, @numObra, @hs, @hsExtra, @hsExtraEsp, @hsNoc, @hsExNoc, @hsExtNoctPerm, @hsFeriados, @hsLluvia, @hsViaje, @altura, @donacion, @asamblea, @paternidad, @fallecimiento)
+                INSERT INTO PlanillaHs (ID_, Codigo, Mes, Fecha, NumOra, Hs, HsExtra, HsExtraEsp, HsNoc, HsExNoc, HsExtNoctPerm, HsFeriados, HsLluvia, HsViaje, Altura, Donacion, Asamblea, Paternidad, Fallecimiento, IdUsuario)
+                VALUES (@id, @codigo, @mes, @fecha, @numObra, @hs, @hsExtra, @hsExtraEsp, @hsNoc, @hsExNoc, @hsExtNoctPerm, @hsFeriados, @hsLluvia, @hsViaje, @altura, @donacion, @asamblea, @paternidad, @fallecimiento, @idUsuario)
             `);
     }
 };
