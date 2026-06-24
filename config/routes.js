@@ -10,6 +10,7 @@ const obraRoutes = require('../routes/obraRoutes');
 const parametroCargaHorariaRoutes = require('../routes/parametroCargaHorariaRoutes');
 const pasosCierreHorasRoutes = require('../routes/pasosCierreHorasRoutes');
 const planillaHsRoutes = require('../routes/planillaHsRoutes');
+const reporteRoutes = require('../routes/reporteRoutes');
 /* End Routes includes */
 
 router.use('/', root);
@@ -20,6 +21,7 @@ router.use('/obras', obraRoutes);
 router.use('/parametros-carga-horaria', parametroCargaHorariaRoutes);
 router.use('/pasos-cierre-horas', pasosCierreHorasRoutes);
 router.use('/planilla-hs', planillaHsRoutes);
+router.use('/reporte', reporteRoutes);
 
 
 // catch 404
