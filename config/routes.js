@@ -12,6 +12,7 @@ const pasosCierreHorasRoutes = require('../routes/pasosCierreHorasRoutes');
 const planillaHsRoutes = require('../routes/planillaHsRoutes');
 const reporteRoutes = require('../routes/reporteRoutes');
 const supervisorFuncionarioRoutes = require('../routes/supervisorFuncionarioRoutes');
+const dashboardRoutes = require('../routes/dashboardRoutes');
 /* End Routes includes */
 
 router.use('/', root);
@@ -24,7 +25,7 @@ router.use('/pasos-cierre-horas', pasosCierreHorasRoutes);
 router.use('/planilla-hs', planillaHsRoutes);
 router.use('/reporte', reporteRoutes);
 router.use('/supervisor-funcionario', supervisorFuncionarioRoutes);
-
+router.use('/dashboard', dashboardRoutes);
 
 // catch 404
 router.use(function (req, res) {
