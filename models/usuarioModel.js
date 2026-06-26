@@ -6,6 +6,7 @@ const selectColumns = `
     CodEmp,
     RTRIM(ISNULL(Nombre, '')) AS Nombre,
     RTRIM(ISNULL(Estado, '')) AS Estado,
+    RTRIM(ISNULL(Rol, 'supervisor')) AS Rol,
     FechaAlta
 `;
 
@@ -21,17 +22,18 @@ const getAll = async () => {
     const pool = await getConnection();
     const result = await pool.request()
         .query(`
-            SELECT
-                u.Id,
-                RTRIM(u.Usuario) AS Usuario,
-                u.CodEmp,
-                RTRIM(ISNULL(u.Nombre, '')) AS Nombre,
-                RTRIM(ISNULL(u.Estado, '')) AS Estado,
-                u.FechaAlta,
-                RTRIM(ISNULL(e.Empresa, '')) AS Empresa
-            FROM Usuarios u
-            LEFT JOIN Empresas e ON e.CodEmp = u.CodEmp
-            ORDER BY u.Usuario
+        SELECT
+            u.Id,
+            RTRIM(u.Usuario) AS Usuario,
+            u.CodEmp,
+            RTRIM(ISNULL(u.Nombre, '')) AS Nombre,
+            RTRIM(ISNULL(u.Estado, '')) AS Estado,
+            RTRIM(ISNULL(u.Rol, 'supervisor')) AS Rol,
+            u.FechaAlta,
+            RTRIM(ISNULL(e.Empresa, '')) AS Empresa
+        FROM Usuarios u
+        LEFT JOIN Empresas e ON e.CodEmp = u.CodEmp
+        ORDER BY u.Usuario
         `);
     return result.recordset;
 };
@@ -74,7 +76,7 @@ const existsUsuario = async (pool, usuario, id) => {
     return result.recordset.length > 0;
 };
 
-const create = async ({ usuario, password, codEmp, nombre, estado }) => {
+const create = async ({ usuario, password, codEmp, nombre, estado, rol }) => {
     const pool = await getConnection();
 
     if (await existsUsuario(pool, usuario)) {
@@ -91,16 +93,17 @@ const create = async ({ usuario, password, codEmp, nombre, estado }) => {
         .input('codEmp', codEmp)
         .input('nombre', nombre || '')
         .input('estado', estado || 'A')
+        .input('rol', rol || 'supervisor')
         .query(`
-            INSERT INTO Usuarios (Usuario, Password, CodEmp, Nombre, Estado, FechaAlta)
+            INSERT INTO Usuarios (Usuario, Password, CodEmp, Nombre, Estado, Rol, FechaAlta)
             OUTPUT INSERTED.Id
-            VALUES (@usuario, @password, @codEmp, @nombre, @estado, GETDATE())
+            VALUES (@usuario, @password, @codEmp, @nombre, @estado, @rol GETDATE())
         `);
 
     return getById(result.recordset[0].Id);
 };
 
-const update = async (id, { usuario, password, codEmp, nombre, estado }) => {
+const update = async (id, { usuario, password, codEmp, nombre, estado, rol }) => {
     const pool = await getConnection();
 
     const current = await getById(id);
@@ -119,7 +122,8 @@ const update = async (id, { usuario, password, codEmp, nombre, estado }) => {
         .input('usuario', usuario || current.Usuario)
         .input('codEmp', codEmp || current.CodEmp)
         .input('nombre', nombre !== undefined ? nombre : current.Nombre)
-        .input('estado', estado || current.Estado || 'A');
+        .input('estado', estado || current.Estado || 'A')
+        .input('rol', rol || current.Rol || 'supervisor');
 
     let passwordSet = '';
     if (password) {
@@ -133,7 +137,8 @@ const update = async (id, { usuario, password, codEmp, nombre, estado }) => {
             ${passwordSet}
             CodEmp = @codEmp,
             Nombre = @nombre,
-            Estado = @estado
+            Estado = @estado,
+            Rol = @rol
         WHERE Id = @id
     `);
 

@@ -33,7 +33,8 @@ const login = async (req, res) => {
             id: userActivo.Id,
             username: userActivo.Usuario,
             codEmp: userActivo.CodEmp,
-            nombre: userActivo.Nombre
+            nombre: userActivo.Nombre,
+            rol: userActivo.Rol || 'supervisor'
         });
 
         const tokenConUsuario = `${userActivo.Usuario}_${token}`;
@@ -44,7 +45,8 @@ const login = async (req, res) => {
             data: {
                 token: tokenConUsuario,
                 nombre: userActivo.Nombre,
-                codEmp: userActivo.CodEmp
+                codEmp: userActivo.CodEmp,
+                rol: userActivo.Rol || 'supervisor'
             }
         });
 
@@ -61,7 +63,8 @@ const normalizeUsuario = (body, defaultEstado) => ({
     password: body.password ? String(body.password) : '',
     codEmp: body.codEmp ? Number(body.codEmp) : null,
     nombre: body.nombre !== undefined ? String(body.nombre).trim() : undefined,
-    estado: body.estado ? String(body.estado).trim().toUpperCase() : defaultEstado
+    estado: body.estado ? String(body.estado).trim().toUpperCase() : defaultEstado,
+    rol: body.rol ? String(body.rol).trim().toLowerCase() : 'supervisor'
 });
 
 const getAll = async (req, res) => {

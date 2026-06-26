@@ -3,8 +3,10 @@ const supervisorFuncionarioModel = require('../models/supervisorFuncionarioModel
 
 const getAll = async (req, res) => {
     try {
-        const { codEmp, id } = req.user;
-        const data = await supervisorFuncionarioModel.getByUsuario(id);
+        const { codEmp, id, rol } = req.user;
+        const data = rol === 'admin'
+            ? await funcionarioModel.getByEmpresa(codEmp)
+            : await supervisorFuncionarioModel.getByUsuario(id);
         res.send({ error: false, data });
     } catch (err) {
         res.status(500).send({ error: true, message: err.message });

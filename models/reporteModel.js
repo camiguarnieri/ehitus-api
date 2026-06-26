@@ -1,27 +1,23 @@
 const { getConnection } = require('../helpers/db');
 
-const getReporte = async ({ mesDesde, mesHasta, numObra, codigo, codEmp }) => {
+const getReporte = async ({ mesDesde, mesHasta, numObra, codigo, codEmp, idUsuario, rol }) => {
     const pool = await getConnection();
 
     let where = `f.CodEmp = @codEmp`;
-    const request = pool.request().input('codEmp', codEmp);
+    const request = pool.request()
+        .input('codEmp', codEmp)
+        .input('idUsuario', idUsuario);
 
-    if (mesDesde) {
-        request.input('mesDesde', mesDesde);
-        where += ` AND p.Fecha >= @mesDesde`;
-    }
-    if (mesHasta) {
-        request.input('mesHasta', mesHasta);
-        where += ` AND p.Fecha <= @mesHasta`;
-    }
-    if (numObra) {
-        request.input('numObra', numObra);
-        where += ` AND p.NumOra = @numObra`;
-    }
-    if (codigo) {
-        request.input('codigo', codigo);
-        where += ` AND p.Codigo = @codigo`;
-    }
+    if (mesDesde) { request.input('mesDesde', mesDesde); where += ` AND p.Fecha >= @mesDesde`; }
+    if (mesHasta) { request.input('mesHasta', mesHasta); where += ` AND p.Fecha <= @mesHasta`; }
+    if (numObra) { request.input('numObra', numObra); where += ` AND p.NumOra = @numObra`; }
+    if (codigo) { request.input('codigo', codigo); where += ` AND p.Codigo = @codigo`; }
+
+    const joinSupervisor = rol === 'admin' ? '' : `
+        INNER JOIN SupervisorFuncionario sf 
+            ON sf.CodigoFuncionario = p.Codigo 
+            AND sf.IdUsuario = @idUsuario
+    `;
 
     const result = await request.query(`
         SELECT 
@@ -29,7 +25,7 @@ const getReporte = async ({ mesDesde, mesHasta, numObra, codigo, codEmp }) => {
             p.Codigo,
             RTRIM(f.Apellido1) + ' ' + RTRIM(f.Nombre1) AS NombreCompleto,
             CONVERT(VARCHAR, p.Fecha, 23) AS Fecha,
-            o.Descripcion AS Obra,
+            RTRIM(o.Descripcion) AS Obra,
             p.NumOra,
             ISNULL(p.Hs, 0) AS Hs,
             ISNULL(p.HsExtra, 0) AS HsExtra,
@@ -48,6 +44,7 @@ const getReporte = async ({ mesDesde, mesHasta, numObra, codigo, codEmp }) => {
         FROM PlanillaHs p
         INNER JOIN Funcionarios f ON p.Codigo = f.Codigo
         INNER JOIN Obras o ON p.NumOra = o.NumObra
+        ${joinSupervisor}
         WHERE ${where}
         ORDER BY p.Fecha DESC, f.Apellido1, f.Nombre1
     `);

@@ -1,5 +1,6 @@
 const planillaModel = require('../models/planillaHsModel');
 const supervisorFuncionarioModel = require('../models/supervisorFuncionarioModel'); // ← agregar
+const funcionarioModel = require('../models/funcionarioModel');
 
 const getByFechaObra = async (req, res) => {
     try {
@@ -9,9 +10,11 @@ const getByFechaObra = async (req, res) => {
             return res.status(400).send({ error: true, message: 'Fecha y obra requeridas' });
         }
 
-        const idUsuario = req.user.id;  // ← cambio acá
+        const { id: idUsuario, codEmp, rol } = req.user;
         const cargados = await planillaModel.getByFechaObra(fecha, numObra);
-        const todos = await supervisorFuncionarioModel.getByUsuario(idUsuario);  // ← y acá
+        const todos = rol === 'admin'
+            ? await funcionarioModel.getByEmpresa(codEmp)
+            : await supervisorFuncionarioModel.getByUsuario(idUsuario);
         const parametro = await planillaModel.getParametroDia();
 
         res.send({ error: false, data: { cargados, todos, parametro } });
