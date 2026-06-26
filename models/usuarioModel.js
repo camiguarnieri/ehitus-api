@@ -97,7 +97,7 @@ const create = async ({ usuario, password, codEmp, nombre, estado, rol }) => {
         .query(`
             INSERT INTO Usuarios (Usuario, Password, CodEmp, Nombre, Estado, Rol, FechaAlta)
             OUTPUT INSERTED.Id
-            VALUES (@usuario, @password, @codEmp, @nombre, @estado, @rol GETDATE())
+            VALUES (@usuario, @password, @codEmp, @nombre, @estado, @rol, GETDATE())
         `);
 
     return getById(result.recordset[0].Id);
