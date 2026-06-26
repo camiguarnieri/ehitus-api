@@ -13,6 +13,8 @@ const planillaHsRoutes = require('../routes/planillaHsRoutes');
 const reporteRoutes = require('../routes/reporteRoutes');
 const supervisorFuncionarioRoutes = require('../routes/supervisorFuncionarioRoutes');
 const dashboardRoutes = require('../routes/dashboardRoutes');
+const controlCargaRoutes = require('../routes/controlCargaRoutes');
+const cargaFuncionarioRoutes = require('../routes/cargaFuncionarioRoutes');
 /* End Routes includes */
 
 router.use('/', root);
@@ -26,7 +28,8 @@ router.use('/planilla-hs', planillaHsRoutes);
 router.use('/reporte', reporteRoutes);
 router.use('/supervisor-funcionario', supervisorFuncionarioRoutes);
 router.use('/dashboard', dashboardRoutes);
-
+router.use('/control-carga', controlCargaRoutes);
+router.use('/carga-funcionario', cargaFuncionarioRoutes);
 // catch 404
 router.use(function (req, res) {
     const method = req.method;
