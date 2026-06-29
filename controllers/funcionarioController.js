@@ -45,4 +45,14 @@ const create = async (req, res) => {
     }
 };
 
-module.exports = { getAll, getAllByEmpresa, getById, create };
+const update = async (req, res) => {
+    try {
+        const data = await funcionarioModel.update(Number(req.params.id), req.body);
+        if (!data) return res.status(404).send({ error: true, message: 'Funcionario no encontrado' });
+        res.send({ error: false, data, message: 'Funcionario actualizado correctamente' });
+    } catch (err) {
+        console.log('Error update funcionario:', err.message);
+        res.status(500).send({ error: true, message: err.message });
+    }
+};
+module.exports = { getAll, getAllByEmpresa, getById, create, update };
