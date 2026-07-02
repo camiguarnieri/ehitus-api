@@ -15,6 +15,8 @@ const supervisorFuncionarioRoutes = require('../routes/supervisorFuncionarioRout
 const dashboardRoutes = require('../routes/dashboardRoutes');
 const controlCargaRoutes = require('../routes/controlCargaRoutes');
 const cargaFuncionarioRoutes = require('../routes/cargaFuncionarioRoutes');
+const categoriaRoutes = require('../routes/categoriaRoutes');
+
 /* End Routes includes */
 
 router.use('/', root);
@@ -30,6 +32,7 @@ router.use('/supervisor-funcionario', supervisorFuncionarioRoutes);
 router.use('/dashboard', dashboardRoutes);
 router.use('/control-carga', controlCargaRoutes);
 router.use('/carga-funcionario', cargaFuncionarioRoutes);
+router.use('/categorias', categoriaRoutes);
 // catch 404
 router.use(function (req, res) {
     const method = req.method;

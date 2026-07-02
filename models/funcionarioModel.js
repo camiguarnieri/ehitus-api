@@ -1,17 +1,19 @@
 const { getConnection } = require('../helpers/db');
 
 const camposSelect = `
-    Codigo,
-    RTRIM(Apellido1) AS Apellido1,
-    RTRIM(ISNULL(Apellido2, '')) AS Apellido2,
-    RTRIM(Nombre1) AS Nombre1,
-    RTRIM(ISNULL(Nombre2, '')) AS Nombre2,
-    CodEmp,
-    RTRIM(CI) AS CI,
-    Estado,
-    JorMen,
-    ISNULL(Industria, 0) AS Industria,
-    ISNULL(Ley14411Industria, 0) AS Ley14411Industria
+    f.Codigo,
+    RTRIM(f.Apellido1) AS Apellido1,
+    RTRIM(ISNULL(f.Apellido2, '')) AS Apellido2,
+    RTRIM(f.Nombre1) AS Nombre1,
+    RTRIM(ISNULL(f.Nombre2, '')) AS Nombre2,
+    f.CodEmp,
+    RTRIM(f.CI) AS CI,
+    f.Estado,
+    f.JorMen,
+    ISNULL(f.Industria, 0) AS Industria,
+    ISNULL(f.Ley14411Industria, 0) AS Ley14411Industria,
+    f.CodCat,
+    RTRIM(ISNULL(c.Descripcion, '')) AS DescripcionCategoria
 `;
 
 const getByEmpresa = async (codEmp) => {
@@ -20,9 +22,10 @@ const getByEmpresa = async (codEmp) => {
         .input('codEmp', codEmp)
         .query(`
             SELECT ${camposSelect}
-            FROM Funcionarios
-            WHERE CodEmp = @codEmp
-            ORDER BY Apellido1, Nombre1
+            FROM Funcionarios f
+            LEFT JOIN Categorias c ON c.CodCat = f.CodCat
+            WHERE f.CodEmp = @codEmp
+            ORDER BY f.Apellido1, f.Nombre1
         `);
     return result.recordset;
 };
@@ -33,13 +36,14 @@ const getById = async (codigo) => {
         .input('codigo', codigo)
         .query(`
             SELECT ${camposSelect}
-            FROM Funcionarios
-            WHERE Codigo = @codigo
+            FROM Funcionarios f
+            LEFT JOIN Categorias c ON c.CodCat = f.CodCat
+            WHERE f.Codigo = @codigo
         `);
     return result.recordset[0] || null;
 };
 
-const create = async ({ apellido1, apellido2, nombre1, nombre2, ci, codEmp, jorMen, industria, ley14411Industria }) => {
+const create = async ({ apellido1, apellido2, nombre1, nombre2, ci, codEmp, jorMen, industria, ley14411Industria, codCat }) => {
     const pool = await getConnection();
 
     const existe = await pool.request()
@@ -66,14 +70,15 @@ const create = async ({ apellido1, apellido2, nombre1, nombre2, ci, codEmp, jorM
         .input('jorMen', jorMen || 'J')
         .input('industria', industria ? 1 : 0)
         .input('ley14411Industria', ley14411Industria ? 1 : 0)
+        .input('codCat', codCat || null)
         .query(`
-            INSERT INTO Funcionarios (Codigo, Apellido1, Apellido2, Nombre1, Nombre2, CI, CodEmp, JorMen, Estado, Industria, Ley14411Industria)
-            VALUES (@codigo, @apellido1, @apellido2, @nombre1, @nombre2, @ci, @codEmp, @jorMen, 'A', @industria, @ley14411Industria)
+            INSERT INTO Funcionarios (Codigo, Apellido1, Apellido2, Nombre1, Nombre2, CI, CodEmp, JorMen, Estado, Industria, Ley14411Industria, CodCat)
+            VALUES (@codigo, @apellido1, @apellido2, @nombre1, @nombre2, @ci, @codEmp, @jorMen, 'A', @industria, @ley14411Industria, @codCat)
         `);
     return getById(nextCodigo);
 };
 
-const update = async (codigo, { apellido1, apellido2, nombre1, nombre2, ci, jorMen, estado, industria, ley14411Industria }) => {
+const update = async (codigo, { apellido1, apellido2, nombre1, nombre2, ci, jorMen, estado, industria, ley14411Industria, codCat }) => {
     const pool = await getConnection();
 
     const current = await getById(codigo);
@@ -90,6 +95,7 @@ const update = async (codigo, { apellido1, apellido2, nombre1, nombre2, ci, jorM
         .input('estado', estado || current.Estado)
         .input('industria', industria !== undefined ? (industria ? 1 : 0) : current.Industria)
         .input('ley14411Industria', ley14411Industria !== undefined ? (ley14411Industria ? 1 : 0) : current.Ley14411Industria)
+        .input('codCat', codCat !== undefined ? codCat : current.CodCat)
         .query(`
             UPDATE Funcionarios SET
                 Apellido1 = @apellido1,
@@ -100,7 +106,8 @@ const update = async (codigo, { apellido1, apellido2, nombre1, nombre2, ci, jorM
                 JorMen = @jorMen,
                 Estado = @estado,
                 Industria = @industria,
-                Ley14411Industria = @ley14411Industria
+                Ley14411Industria = @ley14411Industria,
+                CodCat = @codCat
             WHERE Codigo = @codigo
         `);
 
